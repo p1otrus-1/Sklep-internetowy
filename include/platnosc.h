@@ -3,9 +3,9 @@
 #include <cstdint>
 #include "typy_domenowe.h"
 
-class Płatność {
+class Platnosc {
 public:
-    explicit Płatność(std::int64_t kwota_grosze);
+    explicit Platnosc(std::int64_t kwota_grosze);
     std::int64_t pobierzKwoteGrosze() const;
     StatusPlatnosci pobierzStatus() const;
     bool czyOplacona() const;

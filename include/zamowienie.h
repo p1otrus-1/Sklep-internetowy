@@ -6,15 +6,15 @@
 #include "pozycja_zamowienia.h"
 #include "platnosc.h"
 
-class Zamówienie {
+class Zamowienie {
 public:
-    Zamówienie(int id, int id_klienta,
-        const std::vector<PozycjaZamówienia>& pozycje);
+    Zamowienie(int id, int id_klienta,
+        const std::vector<PozycjaZamowienia>& pozycje);
     int pobierzId() const;
     int pobierzIdKlienta() const;
     StatusZamowienia pobierzStatus() const;
-    const std::vector<PozycjaZamówienia>& pobierzPozycje() const;
-    const Płatność& pobierzPlatnosc() const;
+    const std::vector<PozycjaZamowienia>& pobierzPozycje() const;
+    const Platnosc& pobierzPlatnosc() const;
     std::int64_t obliczWartosc() const;
     void oplac();
     void zmienStatus(StatusZamowienia nowy_status);
@@ -23,6 +23,6 @@ private:
     int id_;
     int id_klienta_;
     StatusZamowienia status_;
-    std::vector<PozycjaZamówienia> pozycje_;
-    Płatność platnosc_;
+    std::vector<PozycjaZamowienia> pozycje_;
+    Platnosc platnosc_;
 };

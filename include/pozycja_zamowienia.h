@@ -3,9 +3,9 @@
 #include <cstdint>
 #include <string>
 
-class PozycjaZamówienia {
+class PozycjaZamowienia {
 public:
-    PozycjaZamówienia(int id_produktu, const std::string& nazwa_produktu,
+    PozycjaZamowienia(int id_produktu, const std::string& nazwa_produktu,
             std::int64_t cena_jednostkowa_grosze, int liczba);
     int pobierzIdProduktu() const;
     const std::string& pobierzNazweProduktu() const;

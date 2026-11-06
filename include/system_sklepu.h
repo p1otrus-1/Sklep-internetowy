@@ -13,8 +13,8 @@ class SystemSklepu {
 public:
     SystemSklepu();
     ~SystemSklepu();
-    void dodajUzytkownika(std::unique_ptr<Użytkownik> uzytkownik);
-    const Użytkownik& pobierzUzytkownika(int id_uzytkownika) const;
+    void dodajUzytkownika(std::unique_ptr<Uzytkownik> uzytkownik);
+    const Uzytkownik& pobierzUzytkownika(int id_uzytkownika) const;
     Klient& pobierzKlienta(int id_klienta);
     const Klient& pobierzKlienta(int id_klienta) const;
     std::vector<Produkt> wyszukajProdukty(const std::string& nazwa,
@@ -25,23 +25,23 @@ public:
     std::int64_t obliczWartoscKoszyka(int id_klienta) const;
     int zlozZamowienie(int id_klienta);
     void oplacZamowienie(int id_klienta, int id_zamowienia);
-    int dodajProdukt(const Użytkownik& uzytkownik, const std::string& nazwa,
+    int dodajProdukt(const Uzytkownik& uzytkownik, const std::string& nazwa,
             const std::string& kategoria, std::int64_t cena_grosze,
             int stan_magazynowy);
-    void zmienProdukt(const Użytkownik& uzytkownik, int id_produktu,
+    void zmienProdukt(const Uzytkownik& uzytkownik, int id_produktu,
             const std::string& nazwa, const std::string& kategoria,
             std::int64_t cena_grosze);
-    void uzupelnijStanProduktu(const Użytkownik& uzytkownik, int id_produktu,
+    void uzupelnijStanProduktu(const Uzytkownik& uzytkownik, int id_produktu,
         int liczba);
-    void wycofajProdukt(const Użytkownik& uzytkownik, int id_produktu);
-    void zmienStatusZamowienia(const Użytkownik& uzytkownik, int id_zamowienia,
+    void wycofajProdukt(const Uzytkownik& uzytkownik, int id_produktu);
+    void zmienStatusZamowienia(const Uzytkownik& uzytkownik, int id_zamowienia,
             StatusZamowienia nowy_status);
-    const Zamówienie& pobierzZamowienie(int id_zamowienia) const;
+    const Zamowienie& pobierzZamowienie(int id_zamowienia) const;
 
 private:
-    std::vector<std::unique_ptr<Użytkownik>> uzytkownicy_;
+    std::vector<std::unique_ptr<Uzytkownik>> uzytkownicy_;
     std::vector<Produkt> produkty_;
-    std::vector<Zamówienie> zamowienia_;
+    std::vector<Zamowienie> zamowienia_;
     int nastepne_id_produktu_;
     int nastepne_id_zamowienia_;
 };
