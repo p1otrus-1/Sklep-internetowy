@@ -1,0 +1,27 @@
+US01 - Wyszukiwanie produktów
+Jako klient chcę wyszukiwać produkty po nazwie lub kategorii, aby znaleźć interesujące mnie towary.
+Kryterium akceptacji: System zwraca pasujące aktywne produkty wraz z ceną i stanem magazynowym. Brak dopasowania daje pustą listę.
+
+US02 - Dodawanie do koszyka
+Jako klient chcę dodawać produkty w wybranej liczbie do koszyka, aby przygotować zakupy.
+Kryterium akceptacji: Produkt trafia do koszyka lub zwiększa się liczba jego sztuk. Nieprawidłowa liczba albo brak towaru powoduje odrzucenie operacji bez zmiany koszyka.
+
+US03 - Przeglądanie i edycja koszyka
+Jako klient chcę przeglądać i zmieniać zawartość koszyka, aby kontrolować produkty oraz łączny koszt zakupów.
+Kryterium akceptacji: System pokazuje pozycje i sumę według aktualnych cen. Zmiana liczby sztuk lub usunięcie pozycji aktualizuje wartość koszyka.
+
+US04 - Składanie zamówienia
+Jako klient chcę złożyć zamówienie z produktów w koszyku, aby zarejestrować ich zakup.
+Kryterium akceptacji: Poprawny koszyk tworzy zamówienie ze statusem Nowe i stałymi cenami pozycji, zmniejsza stan magazynowy oraz zostaje wyczyszczony. Pusty koszyk lub brak towaru nie zmienia danych.
+
+US05 - Symulacja płatności
+Jako klient chcę opłacić własne zamówienie w symulacji, aby umożliwić jego realizację.
+Kryterium akceptacji: Płatność dotyczy wartości zamówienia i zmienia stan na Opłacona. Ponowna płatność oraz opłacenie cudzego zamówienia są odrzucane.
+
+US06 - Zarządzanie katalogiem
+Jako administrator chcę dodawać, zmieniać i wycofywać produkty oraz uzupełniać ich stan, aby utrzymywać aktualny katalog.
+Kryterium akceptacji: Poprawne zmiany są widoczne w katalogu. Cena jest dodatnia, a stan magazynowy nieujemny. Wycofany produkt nie jest dostępny do zakupu. Klient nie może wykonywać tych operacji.
+
+US07 - Zmiana statusu zamówienia
+Jako administrator chcę zmieniać status zamówienia, aby odzwierciedlać kolejne etapy jego realizacji.
+Kryterium akceptacji: Dozwolona jest kolejność Nowe -> W realizacji -> Wysłane -> Dostarczone. Rozpoczęcie realizacji wymaga płatności. Pomijanie i cofanie etapów oraz zmiany przez klienta są odrzucane.
