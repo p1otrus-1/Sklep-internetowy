@@ -9,39 +9,52 @@
 #include "produkt.h"
 #include "zamowienie.h"
 
+using std::int64_t;
+using std::string;
+using std::unique_ptr;
+using std::vector;
+
 class SystemSklepu {
 public:
     SystemSklepu();
     ~SystemSklepu();
-    void dodajUzytkownika(std::unique_ptr<Uzytkownik> uzytkownik);
+    void dodajUzytkownika(unique_ptr<Uzytkownik> uzytkownik);
     const Uzytkownik& pobierzUzytkownika(int id_uzytkownika) const;
     Klient& pobierzKlienta(int id_klienta);
     const Klient& pobierzKlienta(int id_klienta) const;
-    std::vector<Produkt> wyszukajProdukty(const std::string& nazwa,
-            const std::string& kategoria) const;
+    vector<Produkt> wyszukajProdukty(const string& nazwa,
+                                     const string& kategoria) const;
     void dodajDoKoszyka(int id_klienta, int id_produktu, int liczba);
     void zmienLiczbeWKoszyku(int id_klienta, int id_produktu, int liczba);
     void usunZKoszyka(int id_klienta, int id_produktu);
-    std::int64_t obliczWartoscKoszyka(int id_klienta) const;
+    int64_t obliczWartoscKoszyka(int id_klienta) const;
     int zlozZamowienie(int id_klienta);
     void oplacZamowienie(int id_klienta, int id_zamowienia);
-    int dodajProdukt(const Uzytkownik& uzytkownik, const std::string& nazwa,
-            const std::string& kategoria, std::int64_t cena_grosze,
-            int stan_magazynowy);
+    int dodajProdukt(const Uzytkownik& uzytkownik, const string& nazwa,
+                     const string& kategoria, int64_t cena_grosze,
+                     int stan_magazynowy);
     void zmienProdukt(const Uzytkownik& uzytkownik, int id_produktu,
-            const std::string& nazwa, const std::string& kategoria,
-            std::int64_t cena_grosze);
+                      const string& nazwa, const string& kategoria,
+                      int64_t cena_grosze);
     void uzupelnijStanProduktu(const Uzytkownik& uzytkownik, int id_produktu,
-        int liczba);
+                               int liczba);
     void wycofajProdukt(const Uzytkownik& uzytkownik, int id_produktu);
     void zmienStatusZamowienia(const Uzytkownik& uzytkownik, int id_zamowienia,
-            StatusZamowienia nowy_status);
+                               StatusZamowienia nowy_status);
     const Zamowienie& pobierzZamowienie(int id_zamowienia) const;
 
+    const Produkt& pobierzProdukt(int id_produktu) const;
+    const vector<Produkt>& pobierzProdukty(const Uzytkownik& uzytkownik) const;
+    vector<Zamowienie> pobierzZamowienia(const Uzytkownik& uzytkownik) const;
+
 private:
-    std::vector<std::unique_ptr<Uzytkownik>> uzytkownicy_;
-    std::vector<Produkt> produkty_;
-    std::vector<Zamowienie> zamowienia_;
+    Produkt& znajdzProdukt(int id_produktu);
+    Zamowienie& znajdzZamowienie(int id_zamowienia);
+    void sprawdzAdministratora(const Uzytkownik& uzytkownik) const;
+
+    vector<unique_ptr<Uzytkownik>> uzytkownicy_;
+    vector<Produkt> produkty_;
+    vector<Zamowienie> zamowienia_;
     int nastepne_id_produktu_;
     int nastepne_id_zamowienia_;
 };
