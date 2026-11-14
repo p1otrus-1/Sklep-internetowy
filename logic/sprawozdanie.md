@@ -91,3 +91,87 @@ Diagram przedstawia składanie zamówienia z uwzględnieniem poprawnego wykonani
 7. **Odrzucenie zamówienia.** Alternatywna gałąź `[produkt niedostępny lub dane niepoprawne]` kończy się zgłoszeniem wyjątku. Przy błędzie walidacji koszyk i stany magazynowe pozostają bez zmian, ponieważ operacje zmieniające dane znajdują się wyłącznie w gałęzi poprawnego wykonania.
 
 Przerywane strzałki odpowiedzi pokazują wartości zwracane przez metody. Komunikaty opisane jako wyjątki oznaczają zgłoszenie błędu, a nie zwrot wartości `bool`. Metody `zmniejszStan(liczba)` i `wyczysc()` mają typ `void`, dlatego nie pokazano dla nich wartości zwrotnych. Konstruktor również nie zwraca wartości. Prostokąty aktywacji oznaczają wykonywanie operacji przez obiekty.
+
+
+## Uzupełnienie implementacyjne - wersja końcowa
+
+Kod z przesłanego ZIP-a używa nazw ASCII: `Uzytkownik`, `Zamowienie`,
+`PozycjaZamowienia`, `Platnosc`. Odpowiadają one klasom zapisanym z polskimi
+znakami na zatwierdzonych diagramach. Istotne operacje sekwencji zachowano.
+
+Dodano warstwę terminalową `Konsola`. Jej pole `system_ : SystemSklepu&`
+stanowi asocjację: jedna konsola korzysta z jednego systemu, system może
+istnieć bez konsoli lub być współdzielony przez kilka konsol. Ta klasa odpowiada wyłącznie za wejście i wyjście.
+`main.cpp` przygotowuje dane i uruchamia konsolę, bez logiki biznesowej.
+
+Doprecyzowania do diagramu klas (publiczne operacje SystemSklepu):
+
+- `oplacZamowienie(id_klienta: int, id_zamowienia: int): void` - istniejąca
+  deklaracja z nagłówka, teraz zaimplementowana; realizuje US05.
+- `pobierzProdukt(id_produktu: int): const Produkt&` - odczyt danych do koszyka.
+- `pobierzProdukty(uzytkownik: const Uzytkownik&): const vector<Produkt>&`
+  - administrator odczytuje pełny katalog, także produkty wycofane.
+- `pobierzZamowienia(uzytkownik: const Uzytkownik&): vector<Zamowienie>`
+  - klient widzi swoje zamówienia, administrator wszystkie.
+
+Prywatne metody `znajdzProdukt`, `znajdzZamowienie` i
+`sprawdzAdministratora` służą wspólnemu wyszukiwaniu oraz sprawdzaniu roli.
+Nie tworzą nowych przypadków użycia.
+
+Wybór przykładowego użytkownika w konsoli symuluje spełniony warunek
+wcześniejszego zalogowania; nie jest implementacją bezpiecznego logowania.
+Uprawnienia operacji administracyjnych i właściciel płatności są sprawdzane
+w SystemSklepu. Dane żyją wyłącznie w pamięci jednej instancji programu.
+
+Aktualny pełny model implementacji znajduje się w
+`diagram_klas_aktualny.png` oraz edytowalnym `diagram_klas_aktualny.puml`.
+Zatwierdzony `diagram klas.pdf` pozostawiono jako wersję z wcześniejszych
+zajęć. W aktualnym modelu zaznaczono również własność kolekcji SystemSklepu
+jako kompozycję, zgodnie z `unique_ptr` i przechowywaniem obiektów przez wartość.
+Przy wymaganym oddaniu w Visual Paradigm należy odwzorować te uzupełnienia
+w projekcie tego narzędzia; plik PlantUML nie jest plikiem Visual Paradigm.
+
+
+### Usprawnienia konsoli i wyszukiwania
+
+Katalog początkowy zawiera 20 stałych produktów w 5 kategoriach.
+Konsola wyświetla dynamiczną listę kategorii i opcjonalnie przyjmuje
+fragment nazwy. Opcja „Wyszukiwanie” tylko wyświetla wyniki.
+Opcja „Dodaj do koszyka” dodatkowo pozwala wskazać produkt i liczbę sztuk.
+Nie dodano nowej klasy kategorii: jej nazwę nadal przechowuje Produkt.
+SystemSklepu::wyszukajProdukty ignoruje wielkość liter ASCII w obu filtrach.
+Konsola zawęża wybraną z listy kategorię do dokładnej nazwy oraz sprawdza,
+czy wybrane ID należy do pokazanych wyników. Dostępność i ilość nadal
+weryfikuje SystemSklepu. Administrator używa wyszukiwania do przeglądania,
+a operacje katalogowe ma w osobnym menu. To usprawnienia PU01 i PU02;
+przebieg składania zamówienia i reguły pozostałych przypadków nie zmieniły się.
+
+Konsola otrzymała prywatne metody pokazNaglowek, wybierzKategorie,
+dodajZListy oraz parametry uzytkownik i dodawanie w wyszukaj.
+Parametr dodawanie ma wartość false dla wyszukiwania i true dla
+dodawania do koszyka. Aktualna sygnatura to
+`wyszukaj(const Uzytkownik& uzytkownik, bool dodawanie)`.
+Aktualny diagram klas uwzględnia te sygnatury. Wejście jest liniowe (Enter), bez opóźnień i
+czyszczenia terminala; dane i płatności pozostają demonstracyjne.
+
+
+### Listy przed wyborem obiektu
+
+Wyszukiwanie i dodawanie do koszyka współdzielą wybór kategorii,
+filtrowanie nazwy i wyświetlanie wyników. Wyszukiwanie kończy się
+na prezentacji wyników, natomiast dodawanie pozwala następnie wybrać
+produkt i liczbę sztuk. Pozostają osobnymi przypadkami użycia.
+Wspólny kod obsługi filtrów nie wymaga dopisywania relacji include/extend
+do zatwierdzonego diagramu.
+
+Konsola pokazuje koszyk przed zmianą ilości i usuwaniem, własne zamówienia
+przed płatnością oraz wszystkie zamówienia administratorowi przed zmianą
+statusu. Operacje katalogowe administratora także pokazują produkty przed
+pytaniem o ID. Puste listy i wybór 0 kończą operację bez zmiany danych.
+Metody pomocnicze wybierzPozycjeKoszyka, wybierzZamowienie, wybierzProdukt
+oraz edytujKoszyk organizują interakcję; reguły biznesowe pozostają w klasach.
+
+Kolejność statusów z US07 zachowano. Osobne komunikaty dotyczą braku płatności,
+wyboru obecnego statusu oraz cofania lub pomijania etapów. Usunięto dopisek
+„sesja demonstracyjna bez haseł” z nagłówka wyboru użytkownika, ale program
+nadal nie uwierzytelnia użytkowników hasłem. Zmiana napisów tego nie zmienia.

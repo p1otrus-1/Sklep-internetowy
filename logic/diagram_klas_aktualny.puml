@@ -1,0 +1,190 @@
+@startuml
+title Sklep internetowy - klasy implementacji C++17
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam defaultFontName DejaVu Sans
+skinparam classFontSize 13
+hide empty members
+top to bottom direction
+class Administrator {
+  + Administrator(int id, const string& nazwa)
+  + bool mozeZarzadzacSklepem() const {override}
+}
+class Klient {
+  + Klient(int id, const string& nazwa)
+  + bool mozeZarzadzacSklepem() const {override}
+  + Koszyk& pobierzKoszyk()
+  + const Koszyk& pobierzKoszyk() const
+  - Koszyk koszyk_
+}
+class Konsola {
+  + explicit Konsola(SystemSklepu& system)
+  + void uruchom()
+  - string wczytajTekst(const string& pytanie)
+  - int64_t wczytajLiczbe(const string& pytanie)
+  - int wczytajInt(const string& pytanie)
+  - void pokazKwote(int64_t grosze) const
+  - void pokazProdukty(const vector<Produkt>& produkty) const
+  - void pokazNaglowek(const string& tytul) const
+  - string wybierzKategorie()
+  - void wyszukaj(const Uzytkownik& uzytkownik, bool dodawanie) 
+  - void dodajZListy(int id_klienta, const vector<Produkt>& produkty)
+  - void pokazKoszyk(int id_klienta) const
+  - void pokazZamowienia(const Uzytkownik& uzytkownik) const
+  - int wybierzPozycjeKoszyka(int id_klienta)
+  - int wybierzZamowienie(const Uzytkownik& uzytkownik)
+  - int wybierzProdukt(const Uzytkownik& administrator)
+  - void edytujKoszyk(int id_klienta, bool usun)
+  - void pokazMenu(bool administrator) const
+  - void obsluzKlienta(int wybor, int id_klienta)
+  - void obsluzAdministratora(int wybor, const Uzytkownik& administrator)
+  - void zapiszProdukt(bool nowy, const Uzytkownik& administrator)
+  - void zmienStatus(const Uzytkownik& administrator)
+  - void sesja(int id_uzytkownika)
+  - SystemSklepu& system_
+}
+class Koszyk {
+  + Koszyk()
+  + void dodajPozycje(int id_produktu, int liczba)
+  + void zmienLiczbe(int id_produktu, int liczba)
+  + void usunPozycje(int id_produktu)
+  + int64_t obliczWartosc(const vector<Produkt>& produkty) const
+  + const vector<PozycjaKoszyka>& pobierzPozycje() const
+  + bool czyPusty() const
+  + void wyczysc()
+  - vector<PozycjaKoszyka> pozycje_
+}
+class Platnosc {
+  + explicit Platnosc(int64_t kwota_grosze)
+  + int64_t pobierzKwoteGrosze() const
+  + StatusPlatnosci pobierzStatus() const
+  + bool czyOplacona() const
+  + void potwierdz()
+  - int64_t kwota_grosze_
+  - StatusPlatnosci status_
+}
+class PozycjaKoszyka {
+  + PozycjaKoszyka(int id_produktu, int liczba)
+  + int pobierzIdProduktu() const
+  + int pobierzLiczbe() const
+  + void zwiekszLiczbe(int liczba)
+  + void zmienLiczbe(int liczba)
+  + int64_t obliczWartosc(int64_t cena_jednostkowa_grosze) const
+  - int id_produktu_
+  - int liczba_
+}
+class PozycjaZamowienia {
+  + PozycjaZamowienia(int id_produktu, const string& nazwa_produktu, int64_t cena_jednostkowa_grosze, int liczba)
+  + int pobierzIdProduktu() const
+  + const string& pobierzNazweProduktu() const
+  + int64_t pobierzCeneJednostkowaGrosze() const
+  + int pobierzLiczbe() const
+  + int64_t obliczWartosc() const
+  - int id_produktu_
+  - string nazwa_produktu_
+  - int64_t cena_jednostkowa_grosze_
+  - int liczba_
+}
+class Produkt {
+  + Produkt(int id, const string& nazwa, const string& kategoria, int64_t cena_grosze, int stan_magazynowy)
+  + int pobierzId() const
+  + const string& pobierzNazwe() const
+  + const string& pobierzKategorie() const
+  + int64_t pobierzCeneGrosze() const
+  + int pobierzStanMagazynowy() const
+  + bool czyAktywny() const
+  + bool czyDostepny(int liczba) const
+  + void zmienDane(const string& nazwa, const string& kategoria, int64_t cena_grosze)
+  + void uzupelnijStan(int liczba)
+  + void zmniejszStan(int liczba)
+  + void wycofaj()
+  - int id_
+  - string nazwa_
+  - string kategoria_
+  - int64_t cena_grosze_
+  - int stan_magazynowy_
+  - bool aktywny_
+}
+class SystemSklepu {
+  + SystemSklepu()
+  + ~SystemSklepu()
+  + void dodajUzytkownika(unique_ptr<Uzytkownik> uzytkownik)
+  + const Uzytkownik& pobierzUzytkownika(int id_uzytkownika) const
+  + Klient& pobierzKlienta(int id_klienta)
+  + const Klient& pobierzKlienta(int id_klienta) const
+  + vector<Produkt> wyszukajProdukty(const string& nazwa, const string& kategoria) const
+  + void dodajDoKoszyka(int id_klienta, int id_produktu, int liczba)
+  + void zmienLiczbeWKoszyku(int id_klienta, int id_produktu, int liczba)
+  + void usunZKoszyka(int id_klienta, int id_produktu)
+  + int64_t obliczWartoscKoszyka(int id_klienta) const
+  + int zlozZamowienie(int id_klienta)
+  + void oplacZamowienie(int id_klienta, int id_zamowienia)
+  + int dodajProdukt(const Uzytkownik& uzytkownik, const string& nazwa, const string& kategoria, int64_t cena_grosze, int stan_magazynowy)
+  + void zmienProdukt(const Uzytkownik& uzytkownik, int id_produktu, const string& nazwa, const string& kategoria, int64_t cena_grosze)
+  + void uzupelnijStanProduktu(const Uzytkownik& uzytkownik, int id_produktu, int liczba)
+  + void wycofajProdukt(const Uzytkownik& uzytkownik, int id_produktu)
+  + void zmienStatusZamowienia(const Uzytkownik& uzytkownik, int id_zamowienia, StatusZamowienia nowy_status)
+  + const Zamowienie& pobierzZamowienie(int id_zamowienia) const
+  + const Produkt& pobierzProdukt(int id_produktu) const
+  + const vector<Produkt>& pobierzProdukty( const Uzytkownik& uzytkownik) const
+  + vector<Zamowienie> pobierzZamowienia( const Uzytkownik& uzytkownik) const
+  - Produkt& znajdzProdukt(int id_produktu)
+  - Zamowienie& znajdzZamowienie(int id_zamowienia)
+  - void sprawdzAdministratora(const Uzytkownik& uzytkownik) const
+  - vector<unique_ptr<Uzytkownik>> uzytkownicy_
+  - vector<Produkt> produkty_
+  - vector<Zamowienie> zamowienia_
+  - int nastepne_id_produktu_
+  - int nastepne_id_zamowienia_
+}
+abstract class Uzytkownik {
+  + Uzytkownik(int id, const string& nazwa)
+  + ~Uzytkownik() {virtual}
+  + int pobierzId() const
+  + const string& pobierzNazwe() const
+  + bool mozeZarzadzacSklepem() const {abstract}
+  - int id_
+  - string nazwa_
+}
+class Zamowienie {
+  + Zamowienie(int id, int id_klienta, const vector<PozycjaZamowienia>& pozycje)
+  + int pobierzId() const
+  + int pobierzIdKlienta() const
+  + StatusZamowienia pobierzStatus() const
+  + const vector<PozycjaZamowienia>& pobierzPozycje() const
+  + const Platnosc& pobierzPlatnosc() const
+  + int64_t obliczWartosc() const
+  + void oplac()
+  + void zmienStatus(StatusZamowienia nowy_status)
+  - int id_
+  - int id_klienta_
+  - StatusZamowienia status_
+  - vector<PozycjaZamowienia> pozycje_
+  - Platnosc platnosc_
+}
+Uzytkownik <|-- Klient
+Uzytkownik <|-- Administrator
+SystemSklepu "1" *-- "0..*" Uzytkownik : unique_ptr
+SystemSklepu "1" *-- "0..*" Produkt
+SystemSklepu "1" *-- "0..*" Zamowienie
+Klient "1" *-- "1" Koszyk
+Koszyk "1" *-- "0..*" PozycjaKoszyka
+Zamowienie "1" *-- "1..*" PozycjaZamowienia
+Zamowienie "1" *-- "1" Platnosc
+PozycjaKoszyka "0..*" --> "1" Produkt : id_produktu_
+PozycjaZamowienia "0..*" --> "1" Produkt : id_produktu_
+Klient "1" -- "0..*" Zamowienie : id_klienta_
+Konsola "0..*" --> "1" SystemSklepu : system_
+enum StatusZamowienia {
+  NOWE
+  W_REALIZACJI
+  WYSLANE
+  DOSTARCZONE
+}
+enum StatusPlatnosci {
+  OCZEKUJACA
+  OPLACONA
+}
+Zamowienie ..> StatusZamowienia
+Platnosc ..> StatusPlatnosci
+@enduml
