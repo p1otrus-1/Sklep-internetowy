@@ -1,1 +1,5 @@
-*.exe
+/sklep
+/sklep.exe
+/testy
+/testy.exe
+*.o
