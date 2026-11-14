@@ -2,15 +2,17 @@
 
 #include <string>
 
+using std::string;
+
 class Uzytkownik {
-    public:
-        Uzytkownik(int id, const std::string& nazwa);
-        virtual ~Uzytkownik();
-        int pobierzId() const;
-        const std::string& pobierzNazwe() const;
-        virtual bool mozeZarzadzacSklepem() const = 0;
-    
-    private:
-        int id_;
-        std::string nazwa_;
+public:
+    Uzytkownik(int id, const string& nazwa);
+    virtual ~Uzytkownik();
+    int pobierzId() const;
+    const string& pobierzNazwe() const;
+    virtual bool mozeZarzadzacSklepem() const = 0;
+
+private:
+    int id_;
+    string nazwa_;
 };
