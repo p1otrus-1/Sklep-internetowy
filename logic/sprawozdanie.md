@@ -76,19 +76,26 @@ Metody: zmienStatusZamowienia.
 
 Na zatwierdzonym diagramie nie występują relacje «include» ani «extend». Linie ciągłe łączą aktorów z dostępnymi dla nich przypadkami użycia. Administrator, podobnie jak Klient, ma dostęp do wyszukiwania produktów. Zarządzanie katalogiem i trzy szczegółowe operacje administracyjne wynikają z US06; na diagramie nie połączono ich relacjami «include» ani «extend».
 
-Zgodnie z adnotacją na diagramie wybrane przypadki użycia wymagają wcześniejszego zalogowania. Logowanie jest traktowane jako warunek wstępny tych operacji; nie przedstawiono go jako osobnego przypadku użycia ani obowiązkowego wywołania «include». Diagram nie określa szczegółowego mechanizmu uwierzytelniania.
+Użytkownik wybiera jedno z przygotowanych kont klienta lub administratora. Dostępne operacje zależą od roli wybranego użytkownika. Uwierzytelnianie nie należy do zakresu projektu.
 
 ## Przebieg komunikatów na diagramie sekwencji - Złóż zamówienie (PU04 / US04)
 
-Diagram przedstawia składanie zamówienia z uwzględnieniem poprawnego wykonania oraz odrzucenia operacji. Uczestniczą w nim obiekty `klient : Klient`, `system : SystemSklepu`, `koszyk : Koszyk`, `produkt : Produkt` oraz tworzony obiekt `zamowienie : Zamówienie`.
+Diagram przedstawia składanie zamówienia z uwzględnieniem poprawnego wykonania oraz odrzucenia operacji. Uczestniczą w nim obiekty `klient : Klient`, `system : SystemSklepu`, `koszyk : Koszyk`, `produkt : Produkt` `konsola : Konsola` oraz tworzony obiekt `zamowienie : Zamówienie`.
 
-1. **Rozpoczęcie operacji.** Obiekt Klient wywołuje `zlozZamowienie(id_klienta)` na obiekcie SystemSklepu. Rozpoczyna się aktywacja systemu, obejmująca obsługę żądania.
-2. **Pobranie koszyka.** System wywołuje na Kliencie `pobierzKoszyk()` i otrzymuje referencję do koszyka (`Koszyk&`). Następnie wywołuje na Koszyku `czyPusty()`, które zwraca wartość `pusty` typu `bool`.
-3. **Sprawdzenie pustego koszyka - fragment `alt`.** Dla warunku `[koszyk pusty]` system zgłasza wyjątek i kończy operację bez utworzenia zamówienia. Dla warunku `[koszyk niepusty]` wywołuje `pobierzPozycje()` i otrzymuje referencję do kolekcji pozycji (`const vector<PozycjaKoszyka>&`).
-4. **Weryfikacja produktów - fragment `loop`.** Dla każdej pozycji koszyka system wywołuje na odpowiednim Produkcie `czyDostepny(liczba)`, `pobierzNazwe()` i `pobierzCeneGrosze()`. Otrzymuje kolejno dostępność typu `bool`, nazwę typu `const string&` i cenę w groszach typu `int64`. Linia życia Produkt reprezentuje kolejne produkty przetwarzane w pętli. Na tym etapie stan magazynowy nie jest zmniejszany.
-5. **Utworzenie zamówienia - fragment `alt`.** Gdy wszystkie pozycje są poprawne i dostępne, system tworzy obiekt przez komunikat `«create» Zamówienie(id, id_klienta, pozycje)`. W tym miejscu rozpoczyna się linia życia obiektu `zamowienie : Zamówienie`. Pozycje zamówienia zachowują nazwę i cenę produktu z chwili zakupu.
-6. **Zmiana stanów i zakończenie.** W drugiej pętli `loop`, dla każdej zamówionej pozycji, system wywołuje `zmniejszStan(liczba)` na Produkcie. Następnie wywołuje `wyczysc()` na Koszyku i zwraca Klientowi `id_zamowienia` typu `int`.
-7. **Odrzucenie zamówienia.** Alternatywna gałąź `[produkt niedostępny lub dane niepoprawne]` kończy się zgłoszeniem wyjątku. Przy błędzie walidacji koszyk i stany magazynowe pozostają bez zmian, ponieważ operacje zmieniające dane znajdują się wyłącznie w gałęzi poprawnego wykonania.
+
+1. **Rozpoczęcie operacji.** Aktor Klient wybiera w menu złożenie zamówienia. Obiekt `konsola : Konsola` wywołuje `zlozZamowienie(id_klienta)` na obiekcie `system : SystemSklepu`.
+
+2. **Pobranie koszyka.** System uzyskuje referencję do obiektu `klient : Klient` przez `pobierzKlienta(id_klienta)`, a następnie wywołuje na nim `pobierzKoszyk()`, otrzymując referencję typu `Koszyk&`. Na obiekcie `koszyk : Koszyk` wywołuje `czyPusty()`, które zwraca wartość typu `bool`.
+
+3. **Sprawdzenie pustego koszyka - fragment `alt`.** Dla warunku `[koszyk pusty]` system zgłasza wyjątek i kończy operację bez utworzenia zamówienia. Dla warunku `[koszyk niepusty]` wywołuje `pobierzPozycje()` i otrzymuje referencję do kolekcji pozycji typu `const vector<PozycjaKoszyka>&`.
+
+4. **Weryfikacja produktów - fragment `loop`.** Dla każdej pozycji koszyka system pobiera identyfikator produktu oraz liczbę sztuk. Następnie uzyskuje referencję do produktu przez `pobierzProdukt(id_produktu)` i sprawdza dostępność wymaganej liczby sztuk metodą `czyDostepny(liczba)`. Jeśli produkt jest dostępny, system pobiera jego identyfikator, nazwę i cenę metodami `pobierzId()`, `pobierzNazwe()` oraz `pobierzCeneGrosze()`. Na podstawie tych danych oraz liczby sztuk tworzy obiekt `PozycjaZamowienia`. Nazwa ma typ `string`, a cena w groszach typ `int64_t`. Linia życia `produkt : Produkt` przedstawia produkty przetwarzane w kolejnych iteracjach pętli. Na tym etapie stan magazynowy pozostaje bez zmian.
+
+5. **Utworzenie zamówienia.** Po pomyślnej weryfikacji wszystkich pozycji system tworzy obiekt `zamowienie : Zamowienie`, wywołując konstruktor `Zamowienie(id, id_klienta, pozycje)`. W kodzie następuje to przez `zamowienia_.emplace_back(...)`. W tym miejscu rozpoczyna się linia życia nowego zamówienia. Jego pozycje przechowują kopie nazw i cen produktów z chwili złożenia zamówienia.
+
+6. **Zmiana stanów i zakończenie - fragment `loop`.** W drugiej pętli system dla każdej pozycji zamówienia odnajduje produkt przez `znajdzProdukt(id_produktu)` i wywołuje na nim `zmniejszStan(liczba)`. Następnie opróżnia koszyk metodą `wyczysc()`, zwiększa licznik identyfikatorów kolejnych zamówień i zwraca do Konsoli `id_zamowienia` typu `int`. Konsola wyświetla użytkownikowi potwierdzenie złożenia zamówienia.
+
+7. **Odrzucenie zamówienia.** Jeśli podczas weryfikacji produkt okaże się niedostępny lub dane będą niepoprawne, system zgłasza wyjątek i przerywa operację. Nie tworzy zamówienia, nie opróżnia koszyka i nie zmniejsza stanów magazynowych. Wyjątek jest przechwytywany przez Konsolę, która wyświetla użytkownikowi komunikat błędu. Na diagramie ścieżkę błędną należy pokazać w miejscu sprawdzania odpowiedniego warunku, jako alternatywę dla dalszego poprawnego wykonania.
 
 Przerywane strzałki odpowiedzi pokazują wartości zwracane przez metody. Komunikaty opisane jako wyjątki oznaczają zgłoszenie błędu, a nie zwrot wartości `bool`. Metody `zmniejszStan(liczba)` i `wyczysc()` mają typ `void`, dlatego nie pokazano dla nich wartości zwrotnych. Konstruktor również nie zwraca wartości. Prostokąty aktywacji oznaczają wykonywanie operacji przez obiekty.
 

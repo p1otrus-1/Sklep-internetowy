@@ -1,5 +1,7 @@
 # Sklep internetowy - C++17
 
+Repozytorium: https://github.com/p1otrus-1/Sklep-internetowy
+
 Konsolowy projekt OOP realizujący US01-US07 z `logic/user stories.txt`.
 Dane są w pamięci i znikają po zamknięciu programu. Na starcie jest 20 stałych produktów w 5 kategoriach
 i użytkownicy: Anna (1), Jan (2), Administrator (3).
